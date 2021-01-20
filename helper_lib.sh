@@ -82,8 +82,7 @@ get_docker_effective_command_line_args() {
   get_docker_cumulative_command_line_args "$OPTION" | tail -n1
 }
 
-get_docker_configuration_file_args() {
-  OPTION="$1"
+get_docker_configuration_file() {
   FILE="$(get_docker_effective_command_line_args '--config-file' | \
     sed 's/.*=//g')"
 
@@ -94,15 +93,23 @@ get_docker_configuration_file_args() {
   else
     CONFIG_FILE='/dev/null'
   fi
-
-  grep "$OPTION" "$CONFIG_FILE" | sed 's/.*: //g' | tr -d \",
 }
 
-get_systemd_service_file() {
+get_docker_configuration_file_args() {
+  OPTION="$1"
+
+  get_docker_configuration_file
+
+  grep "$OPTION" "$CONFIG_FILE" | sed 's/.*://g' | tr -d '" ',
+}
+
+get_service_file() {
   SERVICE="$1"
 
   if [ -f "/etc/systemd/system/$SERVICE" ]; then
     echo "/etc/systemd/system/$SERVICE"
+  elif [ -f "/lib/systemd/system/$SERVICE" ]; then
+    echo "/lib/systemd/system/$SERVICE"
   elif systemctl show -p FragmentPath "$SERVICE" 2> /dev/null 1>&2; then
     systemctl show -p FragmentPath "$SERVICE" | sed 's/.*=//'
   else
@@ -117,6 +124,6 @@ yell "# ------------------------------------------------------------------------
 # Docker, Inc. (c) 2015-
 #
 # Checks for dozens of common best-practices around deploying Docker containers in production.
-# Inspired by the CIS Docker Community Edition Benchmark v1.1.0.
+# Inspired by the CIS Docker Benchmark v1.2.0.
 # ------------------------------------------------------------------------------"
 }
