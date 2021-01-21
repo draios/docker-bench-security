@@ -1,0 +1,6 @@
+FROM scratch
+
+ENV OUTPUT_DIR=/out
+
+COPY ./*.sh ${OUTPUT_DIR}/
+COPY ./tests/*.sh ${OUTPUT_DIR}/tests/
