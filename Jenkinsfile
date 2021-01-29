@@ -15,7 +15,7 @@ pipeline {
                     doGenerateSubmoduleConfigurations: false,
                     extensions: [],
                     submoduleCfg: [],
-                    userRemoteConfigs: [[credentialsId: 'github-jenkins-user-token', url: 'https://github.com/draios/docker-security-bench.git']]
+                    userRemoteConfigs: [[credentialsId: 'github-jenkins-user-token', url: 'https://github.com/draios/docker-bench-security.git']]
                 ])
                 script {
                     docker.withRegistry("https://docker.internal.sysdig.com", 'jenkins-artifactory') {
