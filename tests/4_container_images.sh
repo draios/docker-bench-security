@@ -1,20 +1,5 @@
 #!/bin/sh
 
-if [ -n "$imgList" ]; then
-    pattern=$(echo "$imgList" | sed 's/,/ /g')
-    for img in $pattern; do
-      echo "Looking for image $img"
-      sha256=$(docker image ls "$img" -q)
-      if [ -z "$sha256" ]; then
-        echo "Image $img not found. Exiting."
-        exit 1
-      fi
-      images="$images $sha256 "
-    done 
-else
-  images=$(docker images -q)  
-fi
-
 check_4() {
   logit "\n"
   id_4="4"
@@ -27,7 +12,7 @@ check_4() {
 # 4.1
 check_4_1() {
   id_4_1="4.1"
-  desc_4_1="Ensure a user for the container has been created"
+  desc_4_1="Ensure that a user for the container has been created (Scored)"
   check_4_1="$id_4_1  - $desc_4_1"
   starttestjson "$id_4_1" "$desc_4_1"
 
@@ -54,11 +39,11 @@ check_4_1() {
         if [ $fail -eq 0 ]; then
           warn "$check_4_1"
           warn "     * Running as root: $c"
-	  root_containers="$root_containers $c"
+          root_containers="$root_containers $c"
           fail=1
         else
           warn "     * Running as root: $c"
-	  root_containers="$root_containers $c"
+          root_containers="$root_containers $c"
         fi
       fi
     done
@@ -79,7 +64,7 @@ check_4_1() {
 # 4.2
 check_4_2() {
   id_4_2="4.2"
-  desc_4_2="Ensure that containers use trusted base images"
+  desc_4_2="Ensure that containers use only trusted base images (Not Scored)"
   check_4_2="$id_4_2  - $desc_4_2"
   starttestjson "$id_4_2" "$desc_4_2"
 
@@ -92,7 +77,7 @@ check_4_2() {
 # 4.3
 check_4_3() {
   id_4_3="4.3"
-  desc_4_3="Ensure unnecessary packages are not installed in the container"
+  desc_4_3="Ensure that unnecessary packages are not installed in the container (Not Scored)"
   check_4_3="$id_4_3  - $desc_4_3"
   starttestjson "$id_4_3" "$desc_4_3"
 
@@ -105,7 +90,7 @@ check_4_3() {
 # 4.4
 check_4_4() {
   id_4_4="4.4"
-  desc_4_4="Ensure images are scanned and rebuilt to include security patches"
+  desc_4_4="Ensure images are scanned and rebuilt to include security patches (Not Scored)"
   check_4_4="$id_4_4  - $desc_4_4"
   starttestjson "$id_4_4" "$desc_4_4"
 
@@ -118,7 +103,7 @@ check_4_4() {
 # 4.5
 check_4_5() {
   id_4_5="4.5"
-  desc_4_5="Ensure Content trust for Docker is Enabled"
+  desc_4_5="Ensure Content trust for Docker is Enabled (Scored)"
   check_4_5="$id_4_5  - $desc_4_5"
   starttestjson "$id_4_5" "$desc_4_5"
 
@@ -137,7 +122,7 @@ check_4_5() {
 # 4.6
 check_4_6() {
   id_4_6="4.6"
-  desc_4_6="Ensure HEALTHCHECK instructions have been added to the container image"
+  desc_4_6="Ensure that HEALTHCHECK instructions have been added to container images (Scored)"
   check_4_6="$id_4_6  - $desc_4_6"
   starttestjson "$id_4_6" "$desc_4_6"
 
@@ -153,7 +138,10 @@ check_4_6() {
       imgName=$(docker inspect --format='{{.RepoTags}}' "$img" 2>/dev/null)
       if ! [ "$imgName" = '[]' ]; then
         warn "     * No Healthcheck found: $imgName"
-	no_health_images="$no_health_images $imgName"
+        no_health_images="$no_health_images $imgName"
+      else
+        warn "     * No Healthcheck found: $img"
+        no_health_images="$no_health_images $img"
       fi
     fi
   done
@@ -170,7 +158,7 @@ check_4_6() {
 # 4.7
 check_4_7() {
   id_4_7="4.7"
-  desc_4_7="Ensure update instructions are not use alone in the Dockerfile"
+  desc_4_7="Ensure update instructions are not use alone in the Dockerfile (Not Scored)"
   check_4_7="$id_4_7  - $desc_4_7"
   starttestjson "$id_4_7" "$desc_4_7"
 
@@ -186,7 +174,7 @@ check_4_7() {
       imgName=$(docker inspect --format='{{.RepoTags}}' "$img" 2>/dev/null)
       if ! [ "$imgName" = '[]' ]; then
         info "     * Update instruction found: $imgName"
-	update_images="$update_images $imgName"
+        update_images="$update_images $imgName"
       fi
     fi
   done
@@ -203,7 +191,7 @@ check_4_7() {
 # 4.8
 check_4_8() {
   id_4_8="4.8"
-  desc_4_8="Ensure setuid and setgid permissions are removed in the images"
+  desc_4_8="Ensure setuid and setgid permissions are removed (Not Scored)"
   check_4_8="$id_4_8  - $desc_4_8"
   starttestjson "$id_4_8" "$desc_4_8"
 
@@ -216,7 +204,7 @@ check_4_8() {
 # 4.9
 check_4_9() {
   id_4_9="4.9"
-  desc_4_9="Ensure COPY is used instead of ADD in Dockerfile"
+  desc_4_9="Ensure that COPY is used instead of ADD in Dockerfiles (Not Scored)"
   check_4_9="$id_4_9  - $desc_4_9"
   starttestjson "$id_4_9" "$desc_4_9"
 
@@ -250,7 +238,7 @@ check_4_9() {
 # 4.10
 check_4_10() {
   id_4_10="4.10"
-  desc_4_10="Ensure secrets are not stored in Dockerfiles"
+  desc_4_10="Ensure secrets are not stored in Dockerfiles (Not Scored)"
   check_4_10="$id_4_10  - $desc_4_10"
   starttestjson "$id_4_10" "$desc_4_10"
 
@@ -263,7 +251,7 @@ check_4_10() {
 # 4.11
 check_4_11() {
   id_4_11="4.11"
-  desc_4_11="Ensure verified packages are only Installed"
+  desc_4_11="Ensure only verified packages are are installed (Not Scored)"
   check_4_11="$id_4_11  - $desc_4_11"
   starttestjson "$id_4_11" "$desc_4_11"
 
